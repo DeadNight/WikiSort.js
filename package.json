@@ -1,0 +1,23 @@
+{
+  "name": "wikisort-js",
+  "version": "0.0.0",
+  "description": "",
+  "main": ".",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeadNight/WikiSort-js.git"
+  },
+  "keywords": [
+    "WikiSort",
+    "js"
+  ],
+  "author": "Nir Leibovitch <nir@rightapp.io>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DeadNight/WikiSort-js/issues"
+  },
+  "homepage": "https://github.com/DeadNight/WikiSort-js#readme"
+}
