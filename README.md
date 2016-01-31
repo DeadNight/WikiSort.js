@@ -1,4 +1,4 @@
-WikiSort js
+WikiSort.js
 ======
 
 WikiSort is an implementation of "block merge sort", or "block sort" for short, which is a stable merge sort based on the work described in ["Ratio based stable in-place merging", by Pok-Son Kim and Arne Kutzner](https://github.com/BonzaiThePenguin/WikiSort/blob/master/tamc2008.pdf) [PDF].
