@@ -302,6 +302,7 @@
   };
 
   // merge operation using an internal buffer
+  // for future reference see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin
   var mergeInternal = function(array, A, B, comp, buffer) {
     /* whenever we find a value to add to the final array, swap it with the value that's already in that spot
      * when this algorithm is finished, 'buffer' will contain its original contents, but in a different order
@@ -394,6 +395,10 @@
     }
   };
 
+  var defaultComparator = function(a, b) {
+    return (a < b) ? -1 : (a > b) ? 1 : 0;
+  };
+
   var WikiSorter = function(cacheSize) {
     /* use a small cache to speed up some of the operations
      * since the cache size is fixed, it's still O(1) memory!
@@ -451,6 +456,7 @@
     },
     // bottom-up merge sort combined with an in-place merge algorithm for O(1) memory use
     sort: function(array, comp) {
+      comp || (comp = defaultComparator);
       var size = array.length, swap;
 
       // if the array is of size 0, 1, 2, or 3, just sort them like so:

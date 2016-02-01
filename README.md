@@ -9,6 +9,15 @@ This is a JavaScript adaptation of [BonzaiThePenguin/WikiSort](https://github.co
 
 * * *
 
+Rodemap
+======
+* implement WikiSort
+* verify in node & in browser
+* write tests
+* write benchmarks
+
+* * *
+
 **If you want to learn how it works, check out the documentation:**<br/>
 &nbsp;&nbsp;• [Chapter 1: Tools](https://github.com/BonzaiThePenguin/WikiSort/blob/master/Chapter%201.%20Tools.md)<br/>
 &nbsp;&nbsp;• [Chapter 2: Merging](https://github.com/BonzaiThePenguin/WikiSort/blob/master/Chapter%202.%20Merging.md)<br/>
