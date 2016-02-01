@@ -5,7 +5,7 @@ WikiSort is an implementation of "block merge sort", or "block sort" for short, 
 
 WikiSort is generally **as fast as a standard merge sort while using O(1) memory**, and is *even faster* when the input is partially ordered or as the arrays get larger. It can also be modified to use any additional memory *optionally* provided to it, which can further improve its speed.
 
-This is a JavaScript adaptation of the [BonzaiThePenguin/WikiSort](https://github.com/BonzaiThePenguin/WikiSort).
+This is a JavaScript adaptation of [BonzaiThePenguin/WikiSort](https://github.com/BonzaiThePenguin/WikiSort).
 
 * * *
 
