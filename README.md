@@ -9,8 +9,7 @@ This is a JavaScript adaptation of [BonzaiThePenguin/WikiSort](https://github.co
 
 * * *
 
-Rodemap
-======
+**Rodemap**
 * implement WikiSort
 * verify in node & in browser
 * write tests
