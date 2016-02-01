@@ -1,23 +1,22 @@
 {
   "name": "wikisort",
-  "version": "0.1.0",
   "description": "WikiSort is generally as fast as a standard merge sort while using O(1) memory, and is even faster when the input is partially ordered or as the arrays get larger. It can also be modified to use any additional memory optionally provided to it, which can further improve its speed.",
   "main": "wikisort.js",
-  "scripts": {
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DeadNight/WikiSort.js.git"
-  },
+  "authors": [
+    "Nir Leibovitch <nir@rightapp.io>"
+  ],
+  "license": "ISC",
   "keywords": [
     "WikiSort",
     "js"
   ],
-  "author": "Nir Leibovitch <nir@rightapp.io>",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/DeadNight/WikiSort-js/issues"
-  },
-  "homepage": "https://github.com/DeadNight/WikiSort-js#readme"
+  "homepage": "https://github.com/DeadNight/WikiSort.js",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
 }
