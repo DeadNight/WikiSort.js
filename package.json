@@ -1,6 +1,6 @@
 {
   "name": "wikisort",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "WikiSort is generally as fast as a standard merge sort while using O(1) memory, and is even faster when the input is partially ordered or as the arrays get larger",
   "main": "wikisort.js",
   "scripts": {
