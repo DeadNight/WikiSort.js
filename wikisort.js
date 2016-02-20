@@ -1,5 +1,6 @@
 /**
  * Created by Nir Leibovitch on 01/02/2016.
+ * This is a JavaScript adaptation of https://github.com/BonzaiThePenguin/WikiSort
  */
 
 "use strict";
@@ -245,7 +246,7 @@
    * the original author separated implementation - if the smaller of the two ranges fits
    * into the cache, it was copied there using System.arraycopy, but in JavaScript the
    * in-place implementation works better in most cases - http://jsperf.com/rotate-reverse-vs-copy-with-cache
-   * so we ignore the hasCache argument (although it's kept in place for future language improvements)
+   * so we ignore the useCache argument (although it's kept in place for future language improvements)
    */
   var rotate = function(array, amount, range, useCache) {
     if(!range.length) return;
@@ -301,8 +302,9 @@
     }
   };
 
-  // merge operation using an internal buffer
-  // for future reference see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin
+  /* merge operation using an internal buffer
+   * for future reference see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin
+   */
   var mergeInternal = function(array, A, B, comp, buffer) {
     /* whenever we find a value to add to the final array, swap it with the value that's already in that spot
      * when this algorithm is finished, 'buffer' will contain its original contents, but in a different order
@@ -489,15 +491,16 @@
         return;
       }
 
-      // sort groups of 4-8 items at a time using an unstable sorting network,
-      // but keep track of the original item orders to force it to be stable
-      // http://pages.ripco.net/~jgamble/nw.html
+      /* sort groups of 4-8 items at a time using an unstable sorting network,
+       * but keep track of the original item orders to force it to be stable
+       * http://pages.ripco.net/~jgamble/nw.html
+       */
       var iterator = new Iterator(size, 4), order, range;
       while(!iterator.finished()) {
         order = [0, 1, 2, 3, 4, 5, 6, 7];
         range = iterator.nextRange();
 
-        if(range.length() == 8) {
+        if(range.length == 8) {
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 2, 3);
           netSwap(array, order, range, comp, 4, 5); netSwap(array, order, range, comp, 6, 7);
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 1, 3);
@@ -509,7 +512,7 @@
           netSwap(array, order, range, comp, 2, 4); netSwap(array, order, range, comp, 3, 5);
           netSwap(array, order, range, comp, 3, 4);
 
-        } else if (range.length() == 7) {
+        } else if (range.length == 7) {
           netSwap(array, order, range, comp, 1, 2); netSwap(array, order, range, comp, 3, 4); netSwap(array, order, range, comp, 5, 6);
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 3, 5); netSwap(array, order, range, comp, 4, 6);
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 4, 5); netSwap(array, order, range, comp, 2, 6);
@@ -518,7 +521,7 @@
           netSwap(array, order, range, comp, 1, 3); netSwap(array, order, range, comp, 2, 4);
           netSwap(array, order, range, comp, 2, 3);
 
-        } else if (range.length() == 6) {
+        } else if (range.length == 6) {
           netSwap(array, order, range, comp, 1, 2); netSwap(array, order, range, comp, 4, 5);
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 3, 5);
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 3, 4); netSwap(array, order, range, comp, 2, 5);
@@ -526,7 +529,7 @@
           netSwap(array, order, range, comp, 2, 4); netSwap(array, order, range, comp, 1, 3);
           netSwap(array, order, range, comp, 2, 3);
 
-        } else if (range.length() == 5) {
+        } else if (range.length == 5) {
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 3, 4);
           netSwap(array, order, range, comp, 2, 4);
           netSwap(array, order, range, comp, 2, 3); netSwap(array, order, range, comp, 1, 4);
@@ -534,7 +537,7 @@
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 1, 3);
           netSwap(array, order, range, comp, 1, 2);
 
-        } else if (range.length() == 4) {
+        } else if (range.length == 4) {
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 2, 3);
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 1, 3);
           netSwap(array, order, range, comp, 1, 2);
@@ -547,11 +550,117 @@
           blockA = new Range(), blockB = new Range(),
           lastA = new Range(), lastB = new Range(),
           firstA = new Range(),
-          A = new Range(), B = new Range(),
-          pull = [new Pull(), new Pull];
+          A = new Range(), B = new Range();
+
+      var pull = [new Pull(), new Pull()];
 
       // then merge sort the higher levels, which can be 8-15, 16-31, 32-63, 64-127, etc.
-      //TODO: continue from line #555 - https://github.com/BonzaiThePenguin/WikiSort/blob/master/WikiSort.java#L555
+      while(true) {
+        /* if every A and B block will fit into the cache, use a special branch specifically for merging with the cache
+         * (we use < rather than <= since the block size might be one more than iterator.length)
+         */
+        if(iterator.length < this._cacheSize) {
+          //TODO: benchmark this claim in JavaScript
+          /* if four subarrays fit into the cache, it's faster to merge both pairs of subarrays into the cache,
+           * then merge the two merged subarrays from the cache back into the original array
+           */
+          if((iterator.length + 1) * 4 <= this._cacheSize && iterator.length * 4 < size) {
+            iterator.begin();
+            while(!iterator.finished) {
+              // merge A1 and B1 into the cache
+              var A1 = iterator.nextRange(), B1 = iterator.nextRange(),
+                A2 = iterator.nextRange(), B2 = iterator.nextRange();
+
+              if(comp(array[B1.end - 1], array[A1.start]) < 0) {
+                // the two ranges are in reverse order, so copy them in reverse order into the cache
+                arraycopy(array, A1.start, this._cache, B1.length, A1.length);
+                arraycopy(array, B1.start, this._cache, 0, B1.length);
+              } else if(comp(array[B1.start], array[A1.end - 1]) < 0) {
+                // these two ranges weren't already in order, so merge them into the cache
+                mergeInto(array, A1, B1, comp, this._cache, 0);
+              } else {
+                // if A1, B1, A2, and B2 are all in order, skip doing anything else
+                if(comp(array[B2.start], array[A2.end - 1]) >= 0 && comp(array[A2.start], array[B1.end - 1]) >= 0)
+                  continue;
+
+                // copy A1 and B1 into the cache in the same order
+                arraycopy(array, A1.start, this._cache, 0, A1.length);
+                arraycopy(array, B1.start, this._cache, A1.length, B1.length);
+              }
+              A1.set(A1.start, B1.end);
+
+              // merge A2 and B2 into the cache
+              if(comp(array[B2.end - 1], array[A2.start]) < 0) {
+                // the two ranges are in reverse order, so copy them in reverse order into the cache
+                arraycopy(array, A2.start, this._cache, A1.length + B2.length, A2.length);
+                arraycopy(array, B2.start, this._cache, A1.length, B2.length);
+              } else if(comp(array[B2.start], array[A2.end - 1]) < 0) {
+                // these two ranges weren't already in order, so merge them into the cache
+                mergeInto(array, A2, B2, comp, this._cache, A1.length);
+              } else {
+                // copy A2 and B2 into the cache in the same order
+                arraycopy(array, A2.start, this._cache, A1.length, A2.length);
+                arraycopy(array, B2.start, this._cache, A1.length + A2.length, B2.length);
+              }
+              A2.set(A2.start, B2.end);
+
+              // merge A1 and A2 from the cache into the array
+              var A3 = new Range(0, A1.length),
+                B3 = new Range(A1.length, A1.length + A2.length);
+
+              if(comp(this._cache[B3.end - 1], this._cache[A3.start]) < 0) {
+                // the two ranges are in reverse order, so copy them in reverse order into the cache
+                arraycopy(this._cache, A3.start, array, A1.start + A2.length, A3.length);
+                arraycopy(this._cache, B3.start, array, A1.start, B3.length);
+              } else if(comp(this._cache[B3.start], this._cache[A3.end - 1]) < 0) {
+                // these two ranges weren't already in order, so merge them back into the array
+                mergeInto(this._cache, A3, B3, comp, array, A1.start);
+              } else {
+                // copy A3 and B3 into the array in the same order
+                arraycopy(this._cache, A3.start, array, A1.start, A3.length);
+                arraycopy(this._cache, B3.start, array, A1.start + A1.length, B3.length);
+              }
+            }
+
+            /* we merged two levels at the same time, so we're done with this level already
+             * (iterator.nextLevel() is called again at the bottom of this outer merge loop)
+             */
+            iterator.nextLevel();
+
+          } else {
+            iterator.begin();
+            while(!iterator.finished) {
+              A = iterator.nextRange();
+              B = iterator.nextRange();
+
+              if(comp(array[B.end - 1], array[A.start]) < 0) {
+                // the two ranges are in reverse order, so a simple rotation should fix it
+                rotate(array, A.length, new Range(A.start, B.end), true);
+              } else if(comp(array[B.start], array[A.end - 1]) < 0) {
+                // these two ranges weren't already in order, so we'll need to merge them!
+                arraycopy(array, A.start, this._cache, 0, A.length());
+                this.mergeExternal(array, A, B, comp);
+              }
+            }
+          }
+        } else {
+          /* this is where the in-place merge logic starts!
+           * 1. pull out two internal buffers each containing √A unique values
+           *    1a. adjust block_size and buffer_size if we couldn't find enough unique values
+           * 2. loop over the A and B subarrays within this level of the merge sort
+           *    3. break A and B into blocks of size 'blockSize'
+           *    4. "tag" each of the A blocks with values from the first internal buffer
+           *    5. roll the A blocks through the B blocks and drop/rotate them where they belong
+           *    6. merge each A block with any B values that follow, using the cache or the second internal buffer
+           * 7. sort the second internal buffer if it exists
+           * 8. redistribute the two internal buffers back into the array
+           */
+          //TODO: implement from line #643 - https://github.com/BonzaiThePenguin/WikiSort/blob/master/WikiSort.java#L643
+        }
+
+        // double the size of each A and B subarray that will be merged in the next level
+        if (!iterator.nextLevel()) break;
+      }
     }
   };
 
