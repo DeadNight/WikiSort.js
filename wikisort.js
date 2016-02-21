@@ -108,6 +108,7 @@
       var start = this.decimal;
 
       this.decimal += this.decimalStep;
+      this.numerator += this.numeratorStep;
       if(this.numerator >= this.denominator) {
         this.numerator -= this.denominator;
         ++this.decimal;
@@ -167,7 +168,7 @@
    * where have some idea as to how many unique values there are and where the next value might be
    */
   var findFirstForward = function(array, value, range, comp, unique) {
-    if(!range.length) return range.start;
+    if(range.length == 0) return range.start;
     var index, skip = Math.max(Math.floor(range.length/unique), 1);
 
     for(index = range.start + skip; comp(array[index - 1], value) < 0; index += skip)
@@ -178,7 +179,7 @@
   };
 
   var findLastForward = function(array, value, range, comp, unique) {
-    if(!range.length) return range.start;
+    if(range.length == 0) return range.start;
     var index, skip = Math.max(Math.floor(range.length/unique), 1);
 
     for(index = range.start + skip; comp(value, array[index - 1]) >= 0; index += skip)
@@ -189,7 +190,7 @@
   };
 
   var findFirstBackward = function(array, value, range, comp, unique) {
-    if(!range.length) return range.start;
+    if(range.length == 0) return range.start;
     var index, skip = Math.max(Math.floor(range.length/unique), 1);
 
     for(index = range.end - skip; index > range.start && comp(array[index - 1], value) >= 0; index -= skip)
@@ -200,12 +201,12 @@
   };
 
   var findLastBackward = function(array, value, range, comp, unique) {
-    if(!range.length) return range.start;
+    if(range.length == 0) return range.start;
     var index, skip = Math.max(Math.floor(range.length/unique), 1);
 
     for(index = range.end - skip; index > range.start && comp(value, array[index - 1]) < 0; index -= skip)
       if(index < range.start + skip)
-        return binaryFirst(array, value, new Range(range.start, index), comp);
+        return binaryLast(array, value, new Range(range.start, index), comp);
 
     return binaryLast(array, value, new Range(index, index + skip), comp);
   };
@@ -216,7 +217,7 @@
     for(i = range.start + 1; i < range.end; ++i) {
       temp = array[i];
       for(j = i; j > range.start && comp(temp, array[j - 1]) < 0; --j)
-        array[j] = array[j-i]
+        array[j] = array[j - 1];
       array[j] = temp;
     }
   };
@@ -232,12 +233,12 @@
   };
 
   // swap a series of values in the array
-  var blockSwap = function(array, begin1, begin2, blockSize) {
+  var blockSwap = function(array, start1, start2, blockSize) {
     var index, swap;
     for(index = 0; index < blockSize; ++index) {
-      swap = array[begin1 + index];
-      array[begin1 + index] = array[begin2.index];
-      array[begin2 + index] = swap;
+      swap = array[start1 + index];
+      array[start1 + index] = array[start2 + index];
+      array[start2 + index] = swap;
     }
   };
 
@@ -273,29 +274,29 @@
 
   // merge two ranges from one array and save the results into a different array
   var mergeInto = function(from, A, B, comp, into, atIndex) {
-    var AIndex = A.start,
-        BIndex = B.start,
+    var aIndex = A.start,
+        bIndex = B.start,
         insertIndex = atIndex,
-        ALast = A.end,
-        BLast = B.end;
+        aLast = A.end,
+        bLast = B.end;
 
     while(true) {
-      if(comp(from[BIndex], from[AIndex]) >= 0) {
-        into[insertIndex] = from[AIndex];
-        ++AIndex;
+      if(comp(from[bIndex], from[aIndex]) >= 0) {
+        into[insertIndex] = from[aIndex];
+        ++aIndex;
         ++insertIndex;
-        if(AIndex == ALast) {
+        if(aIndex == aLast) {
           // copy the remainder of B into the final array
-          arraycopy(from, BIndex, into, insertIndex, BLast - BIndex);
+          arraycopy(from, bIndex, into, insertIndex, bLast - bIndex);
           break;
         }
       } else {
-        into[insertIndex] = from[BIndex];
-        ++BIndex;
+        into[insertIndex] = from[bIndex];
+        ++bIndex;
         ++insertIndex;
-        if(BIndex == BLast) {
+        if(bIndex == bLast) {
           // copy the remainder of A into the final array
-          arraycopy(from, AIndex, into, insertIndex, ALast - AIndex);
+          arraycopy(from, aIndex, into, insertIndex, aLast - aIndex);
           break;
         }
       }
@@ -309,32 +310,32 @@
     /* whenever we find a value to add to the final array, swap it with the value that's already in that spot
      * when this algorithm is finished, 'buffer' will contain its original contents, but in a different order
      */
-    var ACount = 0, BCount = 0, insert = 0, swap;
+    var aCount = 0, bCount = 0, insert = 0, swap;
 
     if(B.length > 0 && A.length > 0) {
       while(true) {
-        if(comp(array[B.start + BCount], array[buffer.start + ACount]) >= 0) {
+        if(comp(array[B.start + bCount], array[buffer.start + aCount]) >= 0) {
           swap = array[A.start + insert];
-          array[A.start + insert] = array[buffer.start + ACount];
-          array[buffer.start + ACount] = swap;
-          ++ACount;
+          array[A.start + insert] = array[buffer.start + aCount];
+          array[buffer.start + aCount] = swap;
+          ++aCount;
           ++insert;
-          if(ACount >= A.length)
+          if(aCount >= A.length)
             break;
         } else {
           swap = array[A.start + insert];
-          array[A.start + insert] = array[B.start + BCount];
-          array[B.start + BCount] = swap;
-          ++BCount;
+          array[A.start + insert] = array[B.start + bCount];
+          array[B.start + bCount] = swap;
+          ++bCount;
           ++insert;
-          if(BCount >= B.length)
+          if(bCount >= B.length)
             break;
         }
       }
     }
 
     // swap the remainder of A into the final array
-    blockSwap(array, buffer.start + ACount, A.start + insert, A.length - ACount);
+    blockSwap(array, buffer.start + aCount, A.start + insert, A.length - aCount);
   };
 
   // merge operation without a buffer
@@ -429,32 +430,32 @@
     },
     // merge operation using an external buffer
     mergeExternal: function(array, A, B, comp) {
-      var AIndex = 0,
-          BIndex = B.start,
+      var aIndex = 0,
+          bIndex = B.start,
           insertIndex = A.start,
-          ALast = A.length,
-          BLast = B.end;
+          aLast = A.length,
+          bLast = B.end;
 
       if(B.length > 0 && A.length > 0) {
         while(true) {
-          if(comp(array[BIndex], this._cache[AIndex]) >= 0) {
-            array[insertIndex] = this._cache[AIndex];
-            ++AIndex;
+          if(comp(array[bIndex], this._cache[aIndex]) >= 0) {
+            array[insertIndex] = this._cache[aIndex];
+            ++aIndex;
             ++insertIndex;
-            if(AIndex == ALast)
+            if(aIndex == aLast)
               break;
           } else {
-            array[insertIndex] = array[BIndex];
-            ++BIndex;
+            array[insertIndex] = array[bIndex];
+            ++bIndex;
             ++insertIndex;
-            if(BIndex == BLast)
+            if(bIndex == bLast)
               break;
           }
         }
       }
 
       // copy the remainder of A into the final array
-      arraycopy(this._cache, AIndex, array, insertIndex, ALast - AIndex);
+      arraycopy(this._cache, aIndex, array, insertIndex, aLast - aIndex);
     },
     // bottom-up merge sort combined with an in-place merge algorithm for O(1) memory use
     sort: function(array, comp) {
