@@ -10,7 +10,6 @@ This is a JavaScript adaptation of [BonzaiThePenguin/WikiSort](https://github.co
 * * *
 
 **Rodemap**
-* verify in node & in browser
 * write tests
 * write benchmarks
 
