@@ -280,7 +280,7 @@
         BLast = B.end;
 
     while(true) {
-      if(comp(from[BIndex], from[BIndex]) >= 0) {
+      if(comp(from[BIndex], from[AIndex]) >= 0) {
         into[insertIndex] = from[AIndex];
         ++AIndex;
         ++insertIndex;
