@@ -17,7 +17,12 @@
     "sort"
   ],
   "author": "Nir Leibovitch <nir@rightapp.io>",
-  "license": "ISC",
+  "licenses": [
+    {
+      "type": "UNLICENSE",
+      "url": "http://unlicense.org/UNLICENSE"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/DeadNight/WikiSort.js/issues"
   },
