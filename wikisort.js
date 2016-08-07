@@ -3,15 +3,15 @@
  * This is a JavaScript adaptation of https://github.com/BonzaiThePenguin/WikiSort
  */
 
-"use strict";
-
 (function() {
+  'use strict';
+
   /* Establish the root object, `window` (`self`) in the browser, `global`
    * on the server, or `this` in some virtual machines. We use `self`
    * instead of `window` for `WebWorker` support.
    */
-  var root = typeof self == 'object' && self.self === self && self ||
-    typeof global == 'object' && global.global === global && global ||
+  var root = typeof self === 'object' && self.self === self && self ||
+    typeof global === 'object' && global.global === global && global ||
     this;
 
   // Save the previous value of the `wikisort` variable.
@@ -138,13 +138,13 @@
   var binaryFirst = function(array, value, range, comp) {
     var start = range.start, end = range.end - 1, mid;
     while(start < end) {
-      mid = start + Math.floor((end - start)/2);
+      mid = start + Math.floor((end - start) / 2);
       if(comp(array[mid], value) < 0)
         start = mid + 1;
       else
         end = mid;
     }
-    if(start == range.end - 1 && comp(array[start], value) < 0)
+    if(start === range.end - 1 && comp(array[start], value) < 0)
       ++start;
     return start;
   };
@@ -153,13 +153,13 @@
   var binaryLast = function(array, value, range, comp) {
     var start = range.start, end = range.end - 1, mid;
     while(start < end) {
-      mid = start + Math.floor((end - start)/2);
+      mid = start + Math.floor((end - start) / 2);
       if(comp(value, array[mid]) >= 0)
         start = mid + 1;
       else
         end = mid;
     }
-    if(start == range.end - 1 && comp(value, array[start]) >= 0)
+    if(start === range.end - 1 && comp(value, array[start]) >= 0)
       ++start;
     return start;
   };
@@ -168,8 +168,8 @@
    * where have some idea as to how many unique values there are and where the next value might be
    */
   var findFirstForward = function(array, value, range, comp, unique) {
-    if(range.length == 0) return range.start;
-    var index, skip = Math.max(Math.floor(range.length/unique), 1);
+    if(range.length === 0) return range.start;
+    var index, skip = Math.max(Math.floor(range.length / unique), 1);
 
     for(index = range.start + skip; comp(array[index - 1], value) < 0; index += skip)
       if(index >= range.end - skip)
@@ -179,8 +179,8 @@
   };
 
   var findLastForward = function(array, value, range, comp, unique) {
-    if(range.length == 0) return range.start;
-    var index, skip = Math.max(Math.floor(range.length/unique), 1);
+    if(range.length === 0) return range.start;
+    var index, skip = Math.max(Math.floor(range.length / unique), 1);
 
     for(index = range.start + skip; comp(value, array[index - 1]) >= 0; index += skip)
       if(index >= range.end - skip)
@@ -190,8 +190,8 @@
   };
 
   var findFirstBackward = function(array, value, range, comp, unique) {
-    if(range.length == 0) return range.start;
-    var index, skip = Math.max(Math.floor(range.length/unique), 1);
+    if(range.length === 0) return range.start;
+    var index, skip = Math.max(Math.floor(range.length / unique), 1);
 
     for(index = range.end - skip; index > range.start && comp(array[index - 1], value) >= 0; index -= skip)
       if(index < range.start + skip)
@@ -201,8 +201,8 @@
   };
 
   var findLastBackward = function(array, value, range, comp, unique) {
-    if(range.length == 0) return range.start;
-    var index, skip = Math.max(Math.floor(range.length/unique), 1);
+    if(range.length === 0) return range.start;
+    var index, skip = Math.max(Math.floor(range.length / unique), 1);
 
     for(index = range.end - skip; index > range.start && comp(value, array[index - 1]) < 0; index -= skip)
       if(index < range.start + skip)
@@ -225,7 +225,7 @@
   // reverse a range of values within the array
   var reverse = function(array, range) {
     var index, swap;
-    for(index = Math.floor(range.length/2) - 1; index >= 0; --index) {
+    for(index = Math.floor(range.length / 2) - 1; index >= 0; --index) {
       swap = array[range.start + index];
       array[range.start + index] = array[range.end - index - 1];
       array[range.end - index - 1] = swap;
@@ -285,7 +285,7 @@
         into[insertIndex] = from[aIndex];
         ++aIndex;
         ++insertIndex;
-        if(aIndex == aLast) {
+        if(aIndex === aLast) {
           // copy the remainder of B into the final array
           arraycopy(from, bIndex, into, insertIndex, bLast - bIndex);
           break;
@@ -294,7 +294,7 @@
         into[insertIndex] = from[bIndex];
         ++bIndex;
         ++insertIndex;
-        if(bIndex == bLast) {
+        if(bIndex === bLast) {
           // copy the remainder of A into the final array
           arraycopy(from, aIndex, into, insertIndex, aLast - aIndex);
           break;
@@ -340,7 +340,7 @@
 
   // merge operation without a buffer
   var mergeInPlace = function(array, A, B, comp) {
-    if(A.length == 0 || B.length == 0) return;
+    if(A.length === 0 || B.length === 0) return;
     var mid, amount;
 
     /*
@@ -373,14 +373,14 @@
       // rotate A into place
       amount = mid - A.end;
       rotate(array, -amount, new Range(A.start, mid), true);
-      if(B.end == mid)
+      if(B.end === mid)
         break;
 
       // calculate the new A and B ranges
       B.start = mid;
       A.set(A.start + amount, B.start);
       A.start = binaryLast(array, array[A.start], A, comp);
-      if(A.length == 0)
+      if(A.length === 0)
         break;
     }
   };
@@ -388,7 +388,7 @@
   var netSwap = function(array, order, range, comp, x, y) {
     var swap;
     var compare = comp(array[range.start + x], array[range.start + y]);
-    if(compare > 0 || (order[x] > order[y] && compare == 0)) {
+    if(compare > 0 || (order[x] > order[y] && compare === 0)) {
       swap = array[range.start + x];
       array[range.start + x] = array[range.start + y];
       array[range.start + y] = swap;
@@ -442,13 +442,13 @@
             array[insertIndex] = this._cache[aIndex];
             ++aIndex;
             ++insertIndex;
-            if(aIndex == aLast)
+            if(aIndex === aLast)
               break;
           } else {
             array[insertIndex] = array[bIndex];
             ++bIndex;
             ++insertIndex;
-            if(bIndex == bLast)
+            if(bIndex === bLast)
               break;
           }
         }
@@ -459,12 +459,12 @@
     },
     // bottom-up merge sort combined with an in-place merge algorithm for O(1) memory use
     sort: function(array, comp) {
-      comp || (comp = defaultComparator);
+      comp = comp || defaultComparator;
       var size = array.length, swap;
 
       // if the array is of size 0, 1, 2, or 3, just sort them like so:
       if(size < 4) {
-        if(size == 3) {
+        if(size === 3) {
           // hard-coded insertion sort
           if(comp(array[1], array[0]) < 0) {
             swap = array[0];
@@ -481,7 +481,7 @@
               array[1] = swap;
             }
           }
-        } else if(size == 2) {
+        } else if(size = 2) {
           // swap the items if they're out of order
           if(comp(array[1], array[0]) < 0) {
             swap = array[0];
@@ -502,7 +502,7 @@
         order = [0, 1, 2, 3, 4, 5, 6, 7];
         range = iterator.nextRange();
 
-        if(range.length == 8) {
+        if(range.length === 8) {
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 2, 3);
           netSwap(array, order, range, comp, 4, 5); netSwap(array, order, range, comp, 6, 7);
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 1, 3);
@@ -514,7 +514,7 @@
           netSwap(array, order, range, comp, 2, 4); netSwap(array, order, range, comp, 3, 5);
           netSwap(array, order, range, comp, 3, 4);
 
-        } else if(range.length == 7) {
+        } else if(range.length === 7) {
           netSwap(array, order, range, comp, 1, 2); netSwap(array, order, range, comp, 3, 4); netSwap(array, order, range, comp, 5, 6);
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 3, 5); netSwap(array, order, range, comp, 4, 6);
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 4, 5); netSwap(array, order, range, comp, 2, 6);
@@ -523,7 +523,7 @@
           netSwap(array, order, range, comp, 1, 3); netSwap(array, order, range, comp, 2, 4);
           netSwap(array, order, range, comp, 2, 3);
 
-        } else if(range.length == 6) {
+        } else if(range.length === 6) {
           netSwap(array, order, range, comp, 1, 2); netSwap(array, order, range, comp, 4, 5);
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 3, 5);
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 3, 4); netSwap(array, order, range, comp, 2, 5);
@@ -531,7 +531,7 @@
           netSwap(array, order, range, comp, 2, 4); netSwap(array, order, range, comp, 1, 3);
           netSwap(array, order, range, comp, 2, 3);
 
-        } else if(range.length == 5) {
+        } else if(range.length === 5) {
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 3, 4);
           netSwap(array, order, range, comp, 2, 4);
           netSwap(array, order, range, comp, 2, 3); netSwap(array, order, range, comp, 1, 4);
@@ -539,7 +539,7 @@
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 1, 3);
           netSwap(array, order, range, comp, 1, 2);
 
-        } else if(range.length == 4) {
+        } else if(range.length === 4) {
           netSwap(array, order, range, comp, 0, 1); netSwap(array, order, range, comp, 2, 3);
           netSwap(array, order, range, comp, 0, 2); netSwap(array, order, range, comp, 1, 3);
           netSwap(array, order, range, comp, 1, 2);
@@ -571,7 +571,7 @@
             while(!iterator.finished) {
               // merge A1 and B1 into the cache
               var A1 = iterator.nextRange(), B1 = iterator.nextRange(),
-                A2 = iterator.nextRange(), B2 = iterator.nextRange();
+                  A2 = iterator.nextRange(), B2 = iterator.nextRange();
 
               if(comp(array[B1.end - 1], array[A1.start]) < 0) {
                 // the two ranges are in reverse order, so copy them in reverse order into the cache
@@ -608,7 +608,7 @@
 
               // merge A1 and A2 from the cache into the array
               var A3 = new Range(0, A1.length),
-                B3 = new Range(A1.length, A1.length + A2.length);
+                  B3 = new Range(A1.length, A1.length + A2.length);
 
               if(comp(this._cache[B3.end - 1], this._cache[A3.start]) < 0) {
                 // the two ranges are in reverse order, so copy them in reverse order into the cache
@@ -659,7 +659,7 @@
            */
 
           var blockSize = Math.floor(Math.sqrt(iterator.length)),
-            bufferSize = Math.floor(iterator.length/blockSize) + 1;
+              bufferSize = Math.floor(iterator.length / blockSize) + 1;
 
           /* as an optimization, we really only need to pull out the internal buffers once for each level of merges
            * after that we can reuse the same buffers over and over, then redistribute it when we're finished with this level
@@ -673,7 +673,7 @@
 
           // find two internal buffers of size 'bufferSize' each
           var find = bufferSize + bufferSize,
-            findSeparately = false;
+              findSeparately = false;
 
           if(blockSize <= this.cacheSize) {
             /* if every A block fits into the cache then we won't need the second internal buffer,
@@ -704,7 +704,7 @@
              */
             for(last = A.start, count = 1; count < find; last = index, ++count) {
               index = findLastForward(array, array[last], new Range(last + 1, A.end), comp, find - count);
-              if(index == A.end) break;
+              if(index === A.end) break;
             }
             index = last;
 
@@ -716,14 +716,14 @@
               pull[pullIndex].to = A.start;
               pullIndex = 1;
 
-              if(count == bufferSize + bufferSize) {
+              if(count === bufferSize + bufferSize) {
                 /* we were able to find a single contiguous section containing 2√A unique values,
                  * so this section can be used to contain both of the internal buffers we'll need
                  */
                 buffer1.set(A.start, A.start + bufferSize);
                 buffer2.set(A.start + bufferSize, A.start + count);
                 break;
-              } else if(find == bufferSize + bufferSize) {
+              } else if(find === bufferSize + bufferSize) {
                 /* we found a buffer that contains at least √A unique values, but did not contain the full 2√A unique values,
                  * so we still need to find a second separate buffer of at least √A unique values
                  */
@@ -742,7 +742,7 @@
                 buffer2.set(A.start, A.start + count);
                 break;
               }
-            } else if(pullIndex == 0 && count > buffer1.length) {
+            } else if(pullIndex === 0 && count > buffer1.length) {
               // keep track of the largest buffer we were able to find
               buffer1.set(A.start, A.start + count);
 
@@ -757,7 +757,7 @@
              */
             for(last = B.end - 1, count = 1; count < find; last = index - 1, ++count) {
               index = findFirstBackward(array, array[last], new Range(B.start, last), comp, find - count);
-              if(index == B.start) break;
+              if(index === B.start) break;
             }
             index = last;
 
@@ -769,7 +769,7 @@
               pull[pullIndex].to = B.end;
               pullIndex = 1;
 
-              if(count == bufferSize + bufferSize) {
+              if(count === bufferSize + bufferSize) {
                 /* we found a buffer that contains at least √A unique values, but did not contain the full 2√A unique values,
                  * so we still need to find a second separate buffer of at least √A unique values
                  */
@@ -786,14 +786,14 @@
               } else {
                 // buffer2 will be pulled out from a 'B' subarray, so if the first buffer was pulled out from the corresponding 'A' subarray,
                 // we need to adjust the end point for that A subarray so it knows to stop redistributing its values before reaching buffer2
-                if(pull[0].range.start == A.start)
+                if(pull[0].range.start === A.start)
                   pull[0].range.end -= pull[1].count;
 
                 // we found a second buffer in a 'B' subarray containing √A unique values, so we're done!
                 buffer2.set(B.end - count, B.end);
                 break;
               }
-            } else if(pullIndex == 0 && count > buffer1.length) {
+            } else if(pullIndex === 0 && count > buffer1.length) {
               // keep track of the largest buffer we were able to find
               buffer1.set(B.end - count, B.end);
 
@@ -833,13 +833,13 @@
 
           // adjust block_size and buffer_size based on the values we were able to pull out
           bufferSize = buffer1.length;
-          blockSize = Math.floor(iterator.length/bufferSize) + 1;
+          blockSize = Math.floor(iterator.length / bufferSize) + 1;
 
           /* the first buffer NEEDS to be large enough to tag each of the evenly sized A blocks,
            * so this was originally here to test the math for adjusting block_size above
            */
           //TODO: uncomment this line after testing the above
-          if(Math.floor((iterator.length + 1)/blockSize) > bufferSize) throw new Error();
+          if(Math.floor((iterator.length + 1) / blockSize) > bufferSize) throw new Error();
 
           // now that the two internal buffers have been created, it's time to merge each A+B combination at this level of the merge sort!
           iterator.begin();
@@ -849,7 +849,7 @@
 
             // remove any parts of A or B that are being used by the internal buffers
             var start = A.start;
-            if(start == pull[0].range.start) {
+            if(start === pull[0].range.start) {
               if(pull[0].from > pull[0].to) {
                 A.start += pull[0].count;
 
@@ -857,22 +857,22 @@
                  * this only happens for very small subarrays, like √4 = 2, 2 * (2 internal buffers) = 4,
                  * which also only happens when cache_size is small or 0 since it'd otherwise use MergeExternal
                  */
-                if(A.length == 0)
+                if(A.length === 0)
                   continue;
               } else if(pull[0].from < pull[0].to) {
                 B.end -= pull[0].count;
-                if(B.length == 0)
+                if(B.length === 0)
                   continue;
               }
             }
-            if(start == pull[1].range.start) {
+            if(start === pull[1].range.start) {
               if(pull[1].from > pull[1].to) {
                 A.start += pull[1].count;
-                if(A.length == 0)
+                if(A.length === 0)
                   continue;
               } else if(pull[1].from < pull[1].to) {
                 B.end -= pull[1].count;
-                if(B.length == 0)
+                if(B.length === 0)
                   continue;
               }
             }
@@ -919,10 +919,10 @@
                    * if there's a previous B block and the first value of the minimum A block is <= the last value of the previous B block,
                    * then drop that minimum A block behind. or if there are no B blocks left then keep dropping the remaining A blocks.
                    */
-                  if((lastB.length > 0 && comp(array[lastB.end - 1], array[indexA]) >= 0) || blockB.length == 0) {
+                  if((lastB.length > 0 && comp(array[lastB.end - 1], array[indexA]) >= 0) || blockB.length === 0) {
                     // figure out where to split the previous B block, and rotate it at the split
                     var bSplit = binaryFirst(array, array[indexA], lastB, comp),
-                      bRemaining = lastB.end - bSplit;
+                        bRemaining = lastB.end - bSplit;
 
                     // swap the minimum A block to the beginning of the rolling A blocks
                     var minA = blockA.start;
@@ -973,7 +973,7 @@
 
                     // if there are no more A blocks remaining, this step is finished!
                     blockA.start += blockSize;
-                    if(blockA.length == 0)
+                    if(blockA.length === 0)
                       break;
 
                   } else if(blockB.length < blockSize) {
@@ -1030,7 +1030,7 @@
                 index = findFirstForward(array, array[buffer.start], new Range(buffer.end, pull[pullIndex].range.end), comp, unique);
                 amount = index - buffer.end;
                 rotate(array, buffer.length, new Range(buffer.start, index), true);
-                buffer.start += (amount + 1);
+                buffer.start += amount + 1;
                 buffer.end += amount;
                 unique -= 2;
               }
@@ -1042,7 +1042,7 @@
                 amount = buffer.start - index;
                 rotate(array, amount, new Range(index, buffer.end), true);
                 buffer.start -= amount;
-                buffer.end -= (amount + 1);
+                buffer.end -= amount + 1;
                 unique -= 2;
               }
             }

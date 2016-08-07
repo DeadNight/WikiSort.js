@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <script src="wikisort.js"></script>
+    <script>
+        var array = new Array(1.5e6);
+        console.log('populating array of ' + array.length);
+        for(var i = 0; i < array.length; ++i) {
+            array[i] = Math.random();
+        }
+
+        console.log('sorting...');
+        var start = new Date();
+
+        wikisort(array);
+        //array.sort(function(a, b) { return (a < b) ? -1 : (a > b) ? 1 : 0; });
+
+        var time = new Date() - start;
+        console.log('finished in ' + time + 'ms');
+
+        console.log('checking array');
+        for(var i = 1; i < array.length; ++i) {
+            if(array[i] < array[i - 1]) {
+                console.log('failure. i: ' + i + ', arr: ' + array.slice(i - 2, i + 2));
+                break;
+            }
+        }
+        if(i == array.length) console.log('array sorted properly');
+    </script>
+</head>
+<body>
+
+</body>
+</html>

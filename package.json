@@ -4,7 +4,12 @@
   "description": "WikiSort is generally as fast as a standard merge sort while using O(1) memory, and is even faster when the input is partially ordered or as the arrays get larger",
   "main": "wikisort.js",
   "scripts": {
-    "test": "test"
+    "test": "npm run test-node && npm run lint",
+    "coverage": "nyc npm run test-node && nyc report",
+    "coveralls": "nyc npm run test-node && nyc report --reporter=text-lcov | coveralls",
+    "lint": "eslint wikisort.js",
+    "test-node": "qunit-cli test/*.js",
+    "test-browser": "npm i karma-phantomjs-launcher && karma start"
   },
   "repository": {
     "type": "git",
@@ -14,6 +19,7 @@
     "WikiSort",
     "js",
     "JavaScript",
+    "stable",
     "sort"
   ],
   "author": "Nir Leibovitch <nir@rightapp.io>",
